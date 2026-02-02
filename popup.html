@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Sentiment</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">YouTube Sentiment</div>
+      <div id="status" class="status">Loading...</div>
+      <div class="stats">
+        <div class="row">
+          <span>Total</span>
+          <span id="stat-total">-</span>
+        </div>
+        <div class="row">
+          <span>Positive</span>
+          <span id="stat-pos">-</span>
+        </div>
+        <div class="row">
+          <span>Negative</span>
+          <span id="stat-neg">-</span>
+        </div>
+        <div class="row">
+          <span>Neutral</span>
+          <span id="stat-neu">-</span>
+        </div>
+      </div>
+      <button id="analyze-btn" class="btn" disabled>Analyze Comments</button>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

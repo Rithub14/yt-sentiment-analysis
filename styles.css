@@ -1,0 +1,80 @@
+.yt-sentiment-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2147483647;
+  min-width: 220px;
+  padding: 14px 14px 12px;
+  border-radius: 12px;
+  background: #111111;
+  color: #ffffff;
+  font: 600 13px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.yt-sentiment-title {
+  margin-bottom: 10px;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+}
+
+.yt-sentiment-stats {
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.yt-sentiment-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 2px 0;
+  font-size: 12px;
+  color: #e6e6e6;
+}
+
+.yt-sentiment-status {
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: #bdbdbd;
+}
+
+.yt-sentiment-button {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 999px;
+  background: #ff0033;
+  color: #ffffff;
+  font: 600 13px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.yt-sentiment-button:hover {
+  background: #e6002e;
+}
+
+.yt-sentiment-button:active {
+  transform: translateY(1px);
+}
+
+.yt-sentiment-button.is-loading {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.yt-sentiment-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.yt-sentiment-close:hover {
+  opacity: 1;
+}
