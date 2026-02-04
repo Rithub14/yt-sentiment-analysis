@@ -1,0 +1,7 @@
+# DVC ignore patterns for local-only artifacts and environments.
+.venv/
+.hf-cache/
+mlruns/
+mlflow.db
+__pycache__/
+*.pyc

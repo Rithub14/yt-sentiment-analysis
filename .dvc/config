@@ -1,0 +1,5 @@
+[core]
+    no_scm = True
+
+[cache]
+    dir = .dvc/cache
