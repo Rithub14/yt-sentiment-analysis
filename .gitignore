@@ -25,5 +25,9 @@ htmlcov/
 .ruff_cache/
 .mypy_cache/
 
+# MLflow
+mlflow.db
+mlruns/
+
 # OS
 .DS_Store

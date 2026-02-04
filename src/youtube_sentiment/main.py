@@ -1,15 +1,23 @@
 from __future__ import annotations
 
-from typing import Literal
+import logging
 
 from dotenv import load_dotenv
+
+load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+
+from typing import Literal
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from youtube_sentiment.services.sentiment import analyze_sentiments
 from youtube_sentiment.services.youtube_client import fetch_top_level_comments
-
-load_dotenv()
 
 app = FastAPI(title="YouTube Sentiment Backend")
 

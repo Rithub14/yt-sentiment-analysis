@@ -7,6 +7,7 @@ Minimal backend + Chrome extension to analyze YouTube comments with a HuggingFac
 - Sentiment analysis (multilingual model)
 - FastAPI endpoint `/analyze`
 - Chrome extension popup to trigger analysis and show counts
+- MLflow for model tracking
 
 **Setup**
 1. Create `.env` from the template:
@@ -25,12 +26,12 @@ Minimal backend + Chrome extension to analyze YouTube comments with a HuggingFac
 
 **Run the API**
 ```bash
-uv run uvicorn --app-dir src youtube_sentiment.main:app --reload
+uv run uvicorn --app-dir src youtube_sentiment.main:app --reload --port 8001
 ```
 
 **Test the API**
 ```bash
-curl -X POST http://127.0.0.1:8000/analyze \
+curl -X POST http://127.0.0.1:8001/analyze \
   -H "Content-Type: application/json" \
   -d '{"video_id":"VIDEO_ID","max_comments":50}'
 ```
@@ -54,3 +55,17 @@ RUN_INTEGRATION_TESTS=1 uv run pytest -m integration
 
 **Notes**
 - The model cache is stored in `.hf-cache/` (override with `HF_CACHE_DIR`).
+
+**MLflow Model Registry (Local)**
+1. Start MLflow server:
+   ```bash
+   mlflow server \
+     --backend-store-uri sqlite:///mlflow.db \
+     --default-artifact-root ./mlruns \
+     --host 127.0.0.1 \
+     --port 5000
+   ```
+2. Register the pretrained model:
+   ```bash
+   uv run python scripts/register_model.py
+   ```
