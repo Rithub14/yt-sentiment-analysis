@@ -17,6 +17,7 @@ __pycache__/
 data/
 .dvc/tmp/
 .dvc/.dvc/
+models/
 
 # Model cache
 .hf-cache/

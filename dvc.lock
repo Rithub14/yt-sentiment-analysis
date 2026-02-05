@@ -1,0 +1,37 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: uv run python src/youtube_sentiment/training/preprocess.py --input 
+      data/raw/comments.json --output data/processed/comments_cleaned.csv
+    deps:
+    - path: data/raw/comments.json
+      hash: md5
+      md5: 07a4a6fcc5325030a0f6801f83de6839
+      size: 4158
+    - path: src/youtube_sentiment/training/preprocess.py
+      hash: md5
+      md5: aa250d0bb9fd658193862121bfea8afd
+      size: 2101
+    outs:
+    - path: data/processed/comments_cleaned.csv
+      hash: md5
+      md5: 6a6fe30c65a2b3a76bb56c79f2a6df11
+      size: 4729
+  train:
+    cmd: uv run python src/youtube_sentiment/training/train.py --data 
+      data/processed/comments_cleaned.csv --output-dir models
+    deps:
+    - path: data/processed/comments_cleaned.csv
+      hash: md5
+      md5: 6a6fe30c65a2b3a76bb56c79f2a6df11
+      size: 4729
+    - path: src/youtube_sentiment/training/train.py
+      hash: md5
+      md5: c967b465e124db6e5c08967e019f3467
+      size: 6709
+    outs:
+    - path: models
+      hash: md5
+      md5: e1fc547a74d9dea1e56f883d7a5a246d.dir
+      size: 3792330090
+      nfiles: 18

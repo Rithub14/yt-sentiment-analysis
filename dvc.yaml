@@ -1,0 +1,18 @@
+stages:
+  # Stage 1: preprocess raw comments into a CSV for training.
+  preprocess:
+    cmd: uv run python src/youtube_sentiment/training/preprocess.py --input data/raw/comments.json --output data/processed/comments_cleaned.csv
+    deps:
+      - data/raw/comments.json
+      - src/youtube_sentiment/training/preprocess.py
+    outs:
+      - data/processed/comments_cleaned.csv
+
+  # Stage 2: train sentiment model from the processed CSV.
+  train:
+    cmd: uv run python src/youtube_sentiment/training/train.py --data data/processed/comments_cleaned.csv --output-dir models
+    deps:
+      - data/processed/comments_cleaned.csv
+      - src/youtube_sentiment/training/train.py
+    outs:
+      - models
