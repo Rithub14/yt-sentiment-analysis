@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yt-sentiment-backend
+  labels:
+    app: yt-sentiment-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: yt-sentiment-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
