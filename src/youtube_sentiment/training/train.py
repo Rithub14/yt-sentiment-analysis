@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import mlflow
+from mlflow.tracking import MlflowClient
 import numpy as np
 import torch
 from torch.utils.data import Dataset
@@ -16,6 +17,7 @@ from transformers import (
     AutoTokenizer,
     Trainer,
     TrainingArguments,
+    pipeline,
 )
 
 MODEL_NAME = "tabularisai/multilingual-sentiment-analysis"
@@ -171,7 +173,7 @@ def main() -> int:
         report_to=[],
     )
 
-    with mlflow.start_run(run_name="train"):
+    with mlflow.start_run(run_name="train") as run:
         mlflow.log_param("base_model", MODEL_NAME)
         mlflow.log_param("epochs", args.epochs)
         mlflow.log_param("batch_size", args.batch_size)
@@ -196,6 +198,49 @@ def main() -> int:
         model_dir.mkdir(parents=True, exist_ok=True)
         model.save_pretrained(model_dir)
         tokenizer.save_pretrained(model_dir)
+
+        # Register trained model to MLflow Model Registry (Staging).
+        sentiment_pipeline = pipeline(
+            "sentiment-analysis",
+            model=model,
+            tokenizer=tokenizer,
+        )
+        mlflow.transformers.log_model(
+            transformers_model=sentiment_pipeline,
+            artifact_path="model",
+        )
+        model_uri = f"runs:/{run.info.run_id}/model"
+        client = MlflowClient()
+        latest_versions = client.get_latest_versions("yt_sentiment_model")
+        if not latest_versions:
+            raise RuntimeError(
+                "Baseline (v1) not found in MLflow registry. "
+                "Register the pretrained baseline first."
+            )
+
+        result = mlflow.register_model(model_uri, "yt_sentiment_model")
+        notes = (
+            "Fine-tuned on labeled YouTube comments. "
+            "Expected to improve domain relevance versus pretrained baseline."
+        )
+        client.update_model_version(
+            name="yt_sentiment_model",
+            version=result.version,
+            description=notes,
+        )
+        client.transition_model_version_stage(
+            name="yt_sentiment_model",
+            version=result.version,
+            stage="Staging",
+            archive_existing_versions=False,
+        )
+        mlflow.log_param("registered_model_version", result.version)
+
+        if str(result.version) == "1":
+            raise RuntimeError(
+                "Registered version is v1, but baseline already exists. "
+                "Check MLflow tracking URI and registry."
+            )
 
     print(f"Model saved to {model_dir}")
     return 0
