@@ -16,3 +16,13 @@ stages:
       - src/youtube_sentiment/training/train.py
     outs:
       - models
+
+  # Stage 3: drift report comparing current distribution to baseline.
+  drift:
+    cmd: uv run python src/youtube_sentiment/training/drift_report.py --current data/processed/comments_cleaned.csv --baseline reports/baseline_distribution.json --output reports/drift_report.json
+    deps:
+      - data/processed/comments_cleaned.csv
+      - reports/baseline_distribution.json
+      - src/youtube_sentiment/training/drift_report.py
+    outs:
+      - reports/drift_report.json
