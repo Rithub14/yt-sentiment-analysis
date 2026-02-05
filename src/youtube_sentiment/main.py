@@ -13,6 +13,9 @@ logging.basicConfig(
 
 from typing import Literal
 
+import json
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
@@ -30,6 +33,7 @@ def health_check() -> dict:
 class AnalyzeRequest(BaseModel):
     video_id: str = Field(..., min_length=1)
     max_comments: int = Field(100, gt=0, le=500)
+    save_raw: bool = Field(False, description="Save comments to data/raw/comments.json")
 
 
 class AnalyzeResponse(BaseModel):
@@ -55,6 +59,16 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         comments = fetch_top_level_comments(request.video_id, request.max_comments)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if request.save_raw:
+        raw_path = Path("data/raw/comments.json")
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        raw_payload = {
+            "video_id": request.video_id,
+            "max_comments": request.max_comments,
+            "comments": comments,
+        }
+        raw_path.write_text(json.dumps(raw_payload, ensure_ascii=False, indent=2))
 
     sentiments = analyze_sentiments(comments)
 
