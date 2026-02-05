@@ -1,5 +1,12 @@
 [core]
     no_scm = True
+    analytics = False
+    remote = local
 
 [cache]
     dir = .dvc/cache
+
+[remote "local"]
+    url = .dvc/remote
+# For S3 later, replace with: s3://<bucket>/<prefix>
+# For GCS later, replace with: gs://<bucket>/<prefix>

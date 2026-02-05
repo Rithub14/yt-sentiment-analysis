@@ -13,6 +13,11 @@ __pycache__/
 # Environment
 .env
 
+# DVC tracked data (do not commit large files)
+data/
+.dvc/tmp/
+.dvc/.dvc/
+
 # Model cache
 .hf-cache/
 

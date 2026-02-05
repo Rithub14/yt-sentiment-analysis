@@ -59,6 +59,7 @@ RUN_INTEGRATION_TESTS=1 uv run pytest -m integration
 **DVC (Data Versioning)**
 - DVC is used to track datasets, comment dumps, and model artifacts without putting large files in Git.
 - This project is initialized for DVC, but **no pipelines are defined yet** (we will add them later).
+- DVC remote is currently a local placeholder; swap to `s3://...` or `gs://...` when you move storage to S3 or GCS.
 
 **MLflow Model Registry (Local)**
 1. Start MLflow server:
