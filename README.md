@@ -74,3 +74,6 @@ RUN_INTEGRATION_TESTS=1 uv run pytest -m integration
    ```bash
    uv run python scripts/register_model.py
    ```
+
+**CI/CD Secrets**
+- `MLFLOW_TRACKING_URI` (GitHub Actions secret): MLflow tracking server URL used by CI workflows.
