@@ -7,6 +7,10 @@ on:
         description: "Deployment environment (dev|prod)"
         required: false
         default: "prod"
+      image_tag:
+        description: "Image tag to deploy (e.g., sha)"
+        required: false
+        default: ""
 
 jobs:
   deploy:
@@ -15,6 +19,7 @@ jobs:
       MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
       KUBECONFIG: ${{ secrets.KUBECONFIG }}
       ENVIRONMENT: ${{ inputs.environment || 'prod' }}
+      IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,6 +48,8 @@ jobs:
           kubectl apply -f k8s/secret.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
+          kubectl set image deployment/yt-sentiment-backend api=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/yt-sentiment-backend:${IMAGE_TAG}
+          kubectl set env deployment/yt-sentiment-backend IMAGE_TAG=${IMAGE_TAG}
 
       - name: Apply Kubernetes manifests (dev)
         if: ${{ env.ENVIRONMENT == 'dev' }}
@@ -51,3 +58,5 @@ jobs:
           kubectl apply -f k8s/secret.yaml
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
+          kubectl set image deployment/yt-sentiment-backend api=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/yt-sentiment-backend:${IMAGE_TAG}
+          kubectl set env deployment/yt-sentiment-backend IMAGE_TAG=${IMAGE_TAG}
