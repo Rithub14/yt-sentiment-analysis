@@ -1,0 +1,15 @@
+{
+  "baseline": {
+    "POSITIVE": 0.22,
+    "NEGATIVE": 0.4,
+    "NEUTRAL": 0.38
+  },
+  "current": {
+    "POSITIVE": 0.22,
+    "NEGATIVE": 0.4,
+    "NEUTRAL": 0.38
+  },
+  "l1_distance": 0.0,
+  "threshold": 0.2,
+  "drift_detected": false
+}

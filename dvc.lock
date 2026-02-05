@@ -27,11 +27,33 @@ stages:
       size: 4729
     - path: src/youtube_sentiment/training/train.py
       hash: md5
-      md5: c967b465e124db6e5c08967e019f3467
-      size: 6709
+      md5: dacc95cc97e6450573942a693ea6ae1c
+      size: 8357
     outs:
     - path: models
       hash: md5
-      md5: e1fc547a74d9dea1e56f883d7a5a246d.dir
-      size: 3792330090
+      md5: 353028089fcde45bdad7b7b356e4ea51.dir
+      size: 3792330088
       nfiles: 18
+  drift:
+    cmd: uv run python src/youtube_sentiment/training/drift_report.py --current 
+      data/processed/comments_cleaned.csv --baseline 
+      reports/baseline_distribution.json --output reports/drift_report.json
+    deps:
+    - path: data/processed/comments_cleaned.csv
+      hash: md5
+      md5: 6a6fe30c65a2b3a76bb56c79f2a6df11
+      size: 4729
+    - path: reports/baseline_distribution.json
+      hash: md5
+      md5: 05e292c00d174aae920586073f9e2af0
+      size: 60
+    - path: src/youtube_sentiment/training/drift_report.py
+      hash: md5
+      md5: 17df6470edce632f00957a1cf4d17b96
+      size: 2486
+    outs:
+    - path: reports/drift_report.json
+      hash: md5
+      md5: 2a53ee0498793005eb9506463ff780b2
+      size: 238
