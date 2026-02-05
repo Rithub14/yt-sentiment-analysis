@@ -84,3 +84,12 @@ RUN_INTEGRATION_TESTS=1 uv run pytest -m integration
 2. Deploy manually via GitHub Actions → **Deploy Backend**.
    - Requires `KUBECONFIG` secret.
    - Deploys only if a **Production** model exists in MLflow.
+   - Optionally provide `image_tag` to deploy a specific SHA.
+
+Local apply (optional):
+```bash
+kubectl apply -f k8s/configmap-dev.yaml
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+```
