@@ -77,3 +77,10 @@ RUN_INTEGRATION_TESTS=1 uv run pytest -m integration
 
 **CI/CD Secrets**
 - `MLFLOW_TRACKING_URI` (GitHub Actions secret): MLflow tracking server URL used by CI workflows.
+- `KUBECONFIG` (GitHub Actions secret): kubeconfig contents for deploy workflow.
+
+**Deployment (Kubernetes)**
+1. Build & push happens on `main` via CI (GHCR).
+2. Deploy manually via GitHub Actions → **Deploy Backend**.
+   - Requires `KUBECONFIG` secret.
+   - Deploys only if a **Production** model exists in MLflow.
