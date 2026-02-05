@@ -57,3 +57,20 @@ stages:
       hash: md5
       md5: 2a53ee0498793005eb9506463ff780b2
       size: 238
+  evaluate:
+    cmd: uv run python src/youtube_sentiment/training/eval_report.py --input 
+      data/processed/comments_cleaned.csv --output reports/eval_report.json
+    deps:
+    - path: data/processed/comments_cleaned.csv
+      hash: md5
+      md5: 6a6fe30c65a2b3a76bb56c79f2a6df11
+      size: 4729
+    - path: src/youtube_sentiment/training/eval_report.py
+      hash: md5
+      md5: 8a65549ad2e84f54afaeff9f9872bdf3
+      size: 3694
+    outs:
+    - path: reports/eval_report.json
+      hash: md5
+      md5: c1429a67f8b31ef5891148650a048b0d
+      size: 285

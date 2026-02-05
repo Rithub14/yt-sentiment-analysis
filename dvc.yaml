@@ -26,3 +26,12 @@ stages:
       - src/youtube_sentiment/training/drift_report.py
     outs:
       - reports/drift_report.json
+
+  # Stage 4: evaluation report (metrics + confusion matrix).
+  evaluate:
+    cmd: uv run python src/youtube_sentiment/training/eval_report.py --input data/processed/comments_cleaned.csv --output reports/eval_report.json
+    deps:
+      - data/processed/comments_cleaned.csv
+      - src/youtube_sentiment/training/eval_report.py
+    outs:
+      - reports/eval_report.json
