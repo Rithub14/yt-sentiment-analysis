@@ -1,0 +1,41 @@
+name: Scheduled Retrain
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    env:
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Cache uv + HF + DVC
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            ~/.cache/huggingface
+            .dvc/cache
+          key: ${{ runner.os }}-cache-${{ hashFiles('uv.lock') }}
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: DVC repro
+        run: uv run dvc repro
+
+      - name: DVC push
+        run: uv run dvc push
