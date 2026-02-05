@@ -1,0 +1,53 @@
+name: Deploy Backend
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment (dev|prod)"
+        required: false
+        default: "prod"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+      KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      ENVIRONMENT: ${{ inputs.environment || 'prod' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Verify Production model
+        run: uv run python scripts/check_production_model.py
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Apply Kubernetes manifests (prod)
+        if: ${{ env.ENVIRONMENT == 'prod' }}
+        run: |
+          kubectl apply -f k8s/configmap-prod.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      - name: Apply Kubernetes manifests (dev)
+        if: ${{ env.ENVIRONMENT == 'dev' }}
+        run: |
+          kubectl apply -f k8s/configmap-dev.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
