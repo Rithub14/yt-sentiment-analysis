@@ -26,6 +26,8 @@ spec:
           ports:
             - containerPort: 8000
           env:
+            - name: IMAGE_TAG
+              value: latest
             - name: MLFLOW_TRACKING_URI
               valueFrom:
                 configMapKeyRef:
