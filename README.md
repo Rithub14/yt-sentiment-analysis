@@ -96,7 +96,4 @@ kubectl apply -f k8s/service.yaml
 
 **Architecture**
 - Doc: `docs/architecture.md`
-- URL:
-```text
-https://github.com/Rithub14/yt-sentiment-analysis/blob/main/docs/architecture.md
-```
+- Link: [Architecture Doc](https://github.com/Rithub14/yt-sentiment-analysis/blob/main/docs/architecture.md)
