@@ -15,9 +15,11 @@ from typing import Literal
 
 import csv
 import json
+import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from pydantic import BaseModel, Field
 
 from youtube_sentiment.services.sentiment import analyze_sentiments
@@ -25,10 +27,39 @@ from youtube_sentiment.services.youtube_client import fetch_top_level_comments
 
 app = FastAPI(title="YouTube Sentiment Backend")
 
+REQUEST_COUNT = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status_code"],
+)
+REQUEST_LATENCY = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request latency in seconds",
+    ["endpoint"],
+)
+
+
+@app.middleware("http")
+async def metrics_middleware(request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration = time.perf_counter() - start
+    endpoint = request.url.path
+    REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+    REQUEST_COUNT.labels(
+        method=request.method, endpoint=endpoint, status_code=response.status_code
+    ).inc()
+    return response
+
 
 @app.get("/health")
 def health_check() -> dict:
     return {"status": "ok"}
+
+
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 class AnalyzeRequest(BaseModel):
