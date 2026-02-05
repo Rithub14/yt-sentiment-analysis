@@ -13,6 +13,7 @@ logging.basicConfig(
 
 from typing import Literal
 
+import csv
 import json
 from pathlib import Path
 
@@ -34,6 +35,9 @@ class AnalyzeRequest(BaseModel):
     video_id: str = Field(..., min_length=1)
     max_comments: int = Field(100, gt=0, le=500)
     save_raw: bool = Field(False, description="Save comments to data/raw/comments.json")
+    save_processed: bool = Field(
+        False, description="Save labeled comments to data/processed/comments_cleaned.csv"
+    )
 
 
 class AnalyzeResponse(BaseModel):
@@ -63,12 +67,23 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     if request.save_raw:
         raw_path = Path("data/raw/comments.json")
         raw_path.parent.mkdir(parents=True, exist_ok=True)
-        raw_payload = {
-            "video_id": request.video_id,
-            "max_comments": request.max_comments,
-            "comments": comments,
-        }
-        raw_path.write_text(json.dumps(raw_payload, ensure_ascii=False, indent=2))
+        existing_comments: list[str] = []
+        if raw_path.exists():
+            try:
+                raw_data = json.loads(raw_path.read_text(encoding="utf-8"))
+                if isinstance(raw_data, list):
+                    existing_comments = [str(item) for item in raw_data]
+                elif isinstance(raw_data, dict) and isinstance(raw_data.get("comments"), list):
+                    existing_comments = [str(item) for item in raw_data.get("comments", [])]
+            except json.JSONDecodeError:
+                existing_comments = []
+
+        combined = existing_comments + [str(comment) for comment in comments]
+        max_rows = 500
+        if len(combined) > max_rows:
+            combined = combined[-max_rows:]
+
+        raw_path.write_text(json.dumps(combined, ensure_ascii=False, indent=2))
 
     sentiments = analyze_sentiments(comments)
 
@@ -83,6 +98,40 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         label = _normalize_label(str(result.get("label", "NEUTRAL")))
         distribution[label] += 1
         total_confidence += float(result.get("score", 0.0))
+
+    if request.save_processed and comments:
+        processed_path = Path("data/processed/comments_cleaned.csv")
+        processed_path.parent.mkdir(parents=True, exist_ok=True)
+
+        existing_rows: list[dict[str, str]] = []
+        if processed_path.exists():
+            with processed_path.open("r", encoding="utf-8", newline="") as handle:
+                reader = csv.DictReader(handle)
+                for row in reader:
+                    if row.get("text") and row.get("label") is not None:
+                        existing_rows.append(row)
+
+        new_rows: list[dict[str, str]] = []
+        for comment, result in zip(comments, sentiments):
+            label = _normalize_label(str(result.get("label", "NEUTRAL")))
+            score = float(result.get("score", 0.0))
+            new_rows.append(
+                {
+                    "text": str(comment),
+                    "label": label,
+                    "score": f"{score:.6f}",
+                }
+            )
+
+        max_rows = 500
+        combined = existing_rows + new_rows
+        if len(combined) > max_rows:
+            combined = combined[-max_rows:]
+
+        with processed_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=["text", "label", "score"])
+            writer.writeheader()
+            writer.writerows(combined)
 
     total_comments = len(sentiments)
     average_confidence = (
